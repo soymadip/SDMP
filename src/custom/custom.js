@@ -37,7 +37,6 @@ function togglePassword() {
 function submitForgotPassword() {
   const form = document.getElementById("authForm");
   form.action = "src/auth.php?action=fgtpass";
-  form.submit();
 }
 
 // Add custom back button url
@@ -69,6 +68,9 @@ function showUserTypeModal() {
   userTypeModal.show();
 }
 
-document
-  .getElementById("togglePassword")
-  .addEventListener("click", togglePassword);
+document.addEventListener("DOMContentLoaded", function () {
+  var element = document.querjSelector("#togglePassword");
+  if (element) {
+    element.addEventListener("click", togglePassword);
+  }
+});

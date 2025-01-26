@@ -3,7 +3,12 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-include dirname(__DIR__) . '/config.php';
+// check if directly excluded or not.
+if (basename($_SERVER['PHP_SELF']) == 'navbar.php') {
+  header("Location: no-permission.php");
+}
+
+include $hostUrl . '/config.php';
 
 if (isset($_SESSION['username'])) {
   $dashUrl = $hostUrl . '/dash/' . $_SESSION['usertype'] . '.php';
@@ -12,7 +17,7 @@ if (isset($_SESSION['username'])) {
 }
 ?>
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark">
+<nav class="navbar navbar-expand-md">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="<?php echo $hostUrl ?>">
       <img src="<?php echo $hostUrl.'/'.$SiteLogo ?>" alt="Logo" width="37" class="d-inline-block align-middle" />
@@ -24,7 +29,7 @@ if (isset($_SESSION['username'])) {
       aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse justify-content-center justify-content-lg-end text-center"
+    <div class="collapse navbar-collapse justify-content-center justify-content-sm-end text-center"
       id="navbarNavAltMarkup">
       <div class="navbar-nav align-middle">
 
@@ -36,7 +41,7 @@ if (isset($_SESSION['username'])) {
           <i class="fas fa-solid fa-gauge small-icon"></i>
           Dashboard
         </a>
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="<?php echo $hostUrl.'/src/about.php' ?>">
           <i class="fas fa-university small-icon"></i>
           Institute
         </a>
@@ -48,6 +53,7 @@ if (isset($_SESSION['username'])) {
             <?php echo $_SESSION['username']; ?>
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+            <?php if ($DEBUG_MODE) { ?>
             <li class="dropdown-item disabled">
               <i class="fas fa-user-tag small-icon"></i>
               <?php echo $_SESSION['usertype']; ?>
@@ -59,6 +65,7 @@ if (isset($_SESSION['username'])) {
             <li>
               <hr class="dropdown-divider">
             </li>
+            <?php } ?>
             <li>
               <form action="<?php echo $hostUrl ?>/src/auth.php" method="POST" class="d-inline">
                 <input type="hidden" name="action" value="logout" />
@@ -83,4 +90,3 @@ if (isset($_SESSION['username'])) {
 
 <!-- Link Bootstrap & Custom JS -->
 <script src="<?php echo $BtpJs ?>"></script>
-<script src="<?php echo $CstmJs ?>"></script>

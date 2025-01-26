@@ -1,23 +1,26 @@
-<?php
-session_start();
-?>
-
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 
 <head>
   <?php
-        include '../cofig.php';
-        include '../src/head.php';
-      ?>
-  <title>Commity Dashboard | CSMP</title>
+    if (session_status() == PHP_SESSION_NONE) {
+      session_start();
+    }
+
+    $SiteTitle = 'Comity Staff Dash';
+    $allowedUserTypes = ['comity-staff'];
+
+    include_once dirname(__DIR__) . '/config.php';
+    include_once dirname(__DIR__) . '/src/head.php';
+  ?>
 </head>
 
 <body>
   <!-- import navbar -->
   <?php
-        include '../src/navbar.php';
-      ?>
+    include_once dirname(__DIR__) . '/src/check-permission.php';
+    include_once '../src/navbar.php';
+  ?>
 
   <!-- Page heading -->
   <div class="container mt-5 pt-3">
@@ -29,8 +32,13 @@ session_start();
 
 
   <!-- Main area -->
-  <!-- import Bootstrap JS -->
-  <script src="../src/css/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <!-- import Bootstrap.js & custom js -->
+  <script src="<?php echo $BtpJs ?>"></script>
+  <script src="<?php echo $CstmJs ?>"></script>
+
+  <script>
+  SetPrevPage("<?php echo $hostUrl; ?>");
+  </script>
 </body>
 
 </html>

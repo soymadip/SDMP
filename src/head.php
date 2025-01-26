@@ -2,7 +2,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <?php 
-  include dirname(__DIR__) . '/config.php';
+
+include_once dirname(__DIR__) . '/config.php';
+
+// check if directly excluded or not.
+if (basename($_SERVER['PHP_SELF']) == 'head.php') {
+
+  $SiteTitle = 'No Permission';
+
+  $npTxt = 'This page is not meant to accessed directly.';
+  include_once 'no-permission.php';
+}
 ?>
 
 <!-- Favicon links -->

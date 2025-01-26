@@ -3,14 +3,13 @@
 
 <head>
   <?php
-      if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-      }
 
-      $SiteTitle = 'CSMP';
+    $allowedUserTypes = ['all'];
+    $SiteTitle = 'Home';
 
-      include_once 'src/config.php';
-      include_once 'src/head.php';
+    require_once 'config.php';
+    include_once $hostPath.'/src/check-permission.php';
+    include_once $hostPath.'/src/head.php';
   ?>
 </head>
 
@@ -20,7 +19,7 @@
       include_once 'src/navbar.php';
   ?>
   <!-- Main area -->
-  <div class="container d-flex align-items-center  div-index">
+  <div class="container d-flex align-items-center div-index">
     <div class="row log align-items-center py-3 px-4 border border-2 border-danger rounded-3 mx-auto"
       style="max-width: 800px;">
       <div class="col-12 col-md-6 pe-md-5">
@@ -63,7 +62,8 @@
               Please provide a valid password.
             </div>
             <div class="text-end ps-1 small-icon">
-              <a href="#" class="small text-muted"
+              <a href="#"
+                class="small link-secondary link-underline link-underline-opacity-0 link-underline-opacity-75-hover link-opacity-100-hover"
                 onclick="document.getElementById('forgotPasswordForm').submit();">Forgot Password?</a>
             </div>
           </div>
@@ -92,7 +92,6 @@
   <!-- import Bootstrap.js & custom js -->
   <script src="<?php echo $BtpJs ?>"></script>
   <script src="<?php echo $CstmJs ?>"></script>
-
 </body>
 
 </html>

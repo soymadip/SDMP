@@ -11,16 +11,16 @@ if (!isset($_SESSION['username'])) {
 
 <head>
   <?php
-        include '../config.php';
-        include '../src/head.php';
-      ?>
+    include '../config.php';
+    include '../src/head.php';
+  ?>
   <title>Office Dashboard | CSMP</title>
 </head>
 
 <body>
   <!-- import navbar -->
   <?php
-        include '../src/navbar.php';
+    include '../src/navbar.php';
   ?>
 
   <!-- Page heading -->
@@ -31,14 +31,13 @@ if (!isset($_SESSION['username'])) {
     <hr class="my-4">
   </div>
 
-
   <!-- Main area -->
   <!-- import Bootstrap JS -->
   <script src="../src/css/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../src/js/backButtonHandler.js"></script>
   <script>
-    // Call the function with the desired redirect URL
-    handleBackButton('index.php');
+  // Call the function with the desired redirect URL
+  handleBackButton('index.php');
   </script>
 </body>
 

@@ -3,35 +3,32 @@
 
 <head>
   <?php
+    if (session_status() == PHP_SESSION_NONE) {
       session_start();
+    }
 
-      include dirname(__DIR__) . '/config.php';
-      include dirname(__DIR__) . '/src/head.php';
+    $SiteTitle = 'Teacher Dash';
+    $allowedUserTypes = ['teacher'];
 
-      if (!isset($_SESSION['usertype'])) {
-        header("Location: ". $hostUrl);
-        echo $_SESSION['usertype'];
-        exit();
-      } else if (!in_array($_SESSION['usertype'], ['teacher', 'admins'])) {
-        $dashUrl = $hostUrl . '/dash/' . $_SESSION['usertype'] . '.php';
-        header("Location: ". $dashUrl);
-        exit();
-      }
+    include_once dirname(__DIR__) . '/config.php';
+    include_once dirname(__DIR__) . '/src/check-permission.php';
+    include_once dirname(__DIR__) . '/src/head.php';
+
   ?>
-  <title>Teacher Dashboard | CSMP</title>
 </head>
 
 <body>
   <!-- import navbar -->
   <?php
-        include '../src/navbar.php';
+    include_once '../src/navbar.php';
   ?>
 
   <!-- Page heading -->
-  <div class="container mt-5 pt-3">
+  <div class="container mt-5 pt-3 ">
     <h2 class="text-center display-4 my-3">
       <i class="fas fa-user"></i> Teacher Dashboard
     </h2>
+    <p> <?php echo $dashUrl; ?></p>
     <hr class="my-4">
   </div>
 
@@ -39,12 +36,13 @@
   <p><?php echo $hostUrl; ?></p>
 
   <!-- Main area -->
-  <!-- import Bootstrap JS -->
-  <script src="../src/css/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="../src/js/backButtonHandler.js"></script>
+  <!-- import Bootstrap.js & custom js -->
+  <script src="<?php echo $BtpJs ?>"></script>
+  <script src="<?php echo $CstmJs ?>"></script>
+
   <script>
   // Call the function with the desired redirect URL
-  handleBackButton('index.php');
+  SetPrevPage('<?php echo $hostUrl; ?>');
   </script>
 </body>
 

@@ -6,7 +6,7 @@
 }
 
 .navbar {
-  background-color: var(--grey1); /* Match login form color */
+  background-color: var(--grey1);
 }
 
 .navbar-nav .nav-link {
@@ -27,6 +27,11 @@
 
 .abd {
   background-color: var(--grey1);
+}
+
+.spinner-border {
+  width: 3.5rem;
+  height: 3.5rem;
 }
 
 .mrnwthr {
