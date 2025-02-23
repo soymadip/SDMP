@@ -8,12 +8,12 @@ if (basename($_SERVER['PHP_SELF']) == 'navbar.php') {
   header("Location: no-permission.php");
 }
 
-include $hostUrl . '/config.php';
+include $hostPath . '/config.php';
 
 if (isset($_SESSION['username'])) {
-  $dashUrl = $hostUrl . '/dash/' . $_SESSION['usertype'] . '.php';
+  $dashUrl = $hostPath . '/dash/' . $_SESSION['usertype'] . '.php';
 } else {
-  $dashUrl = $hostUrl . '/dash/admin.php';
+  $dashUrl = $hostPath . '/dash/admin.php';
 }
 ?>
 <!-- Navbar -->
