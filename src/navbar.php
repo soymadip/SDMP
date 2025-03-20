@@ -11,9 +11,9 @@ if (basename($_SERVER['PHP_SELF']) == 'navbar.php') {
 include $hostPath . '/config.php';
 
 if (isset($_SESSION['username'])) {
-  $dashUrl = $hostPath . '/dash/' . $_SESSION['usertype'] . '.php';
+  $dashUrl = $hostUrl . '/dash/' . $_SESSION['usertype'] . '.php';
 } else {
-  $dashUrl = $hostPath . '/dash/admin.php';
+  $dashUrl = $hostUrl . '/dash/admin.php';
 }
 ?>
 <!-- Navbar -->

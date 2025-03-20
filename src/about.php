@@ -5,7 +5,7 @@
     include '../config.php';
     include 'head.php';
   ?>
-  <title>About | CSMP</title>
+  <title>About | SDMP</title>
 </head>
 <body>
   <!-- import navbar -->

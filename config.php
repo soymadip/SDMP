@@ -7,13 +7,13 @@ $DEBUG_MODE = true;
 $db_host = 'localhost';
 $db_user = 'root';
 $db_pass = '';
-$db_name = 'CSMP';
+$db_name = 'SDMP';
 
 
-// $hostUrl = 'http://localhost/csmp';
-$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/csmp';
+// $hostUrl = 'http://localhost/sdmp';
+$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/sdmp';
 
-$hostPath = dirname(__DIR__) . '/csmp';
+$hostPath = dirname(__DIR__) . '/sdmp';
 
 
 // Master Users (Have access to all things)
@@ -33,11 +33,11 @@ $FvcnPath = $hostUrl . '/src/images/favicon';
 
 
 //Site configuration
-$SiteName = 'CTS Student Management Portal';
-$SiteShortName = 'CSMP';
-$SiteLogo = 'src/images/cts-logo-com.png';
+$SiteName = 'Student Data Management Portal';
+$SiteShortName = 'SDMP';
+$SiteLogo = 'src/images/icon.png';
 
-$SiteVer = 'v0.4';
+$SiteVer = 'v0.45';
 
 ?>
 

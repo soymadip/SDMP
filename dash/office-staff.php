@@ -14,7 +14,7 @@ if (!isset($_SESSION['username'])) {
     include '../config.php';
     include '../src/head.php';
   ?>
-  <title>Office Dashboard | CSMP</title>
+  <title>Office Dashboard | SDMP</title>
 </head>
 
 <body>

@@ -1,6 +1,6 @@
 {
-  "name": "CSMP",
-  "short_name": "csmp",
+  "name": "SDMP",
+  "short_name": "sdmp",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
