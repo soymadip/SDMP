@@ -52,6 +52,18 @@ else
   exit 1
 fi
 
+
+# Check & create data directories
+for dir in "data" "data/postgres" "data/pgadmin"; do
+  if [ ! -d "$dir" ]; then
+    warn "$dir not found! Creating..."
+    mkdir -p "$dir"
+    chmod 777 "$dir"
+    info "$dir created."
+  fi
+done
+
+
 info "Starting $PROJECT_NAME using $CONTAINER_RUNTIME..."
 
 # Check if containers are already running
