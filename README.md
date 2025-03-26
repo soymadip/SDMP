@@ -1,16 +1,17 @@
 <div align="center">
 <img src="app/src/images/icon.png" width="150">
-<h1>SDMP</h1>
-<h2>Student Database Management Portal</h2>
-<p>A student record management system built with PHP and PostgreSQL</p>
+<h1>SDMP
+</br>
+Student Database Management Portal</h1>
 </div>
+<br>
 
 
 ## 📑 Overview
 
 SDMP (Student Database Management Portal) is a web application designed to manage student records efficiently. It provides an intuitive interface for administrators and teachers to maintain student data, track academic progress, and generate reports.  
 
-This project is being developed as a college submission assignment.
+This project is being developed as my college's major-project submission.
 
 
 ## ✨ Features

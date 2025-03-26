@@ -25,11 +25,11 @@ log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 log_done() { echo -e "${MAGENTA}[INFO] $1${NC}"; }
 
 # Parse command line arguments
-VERBOSE=false
+DETACH=false
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        -v|--verbose)
-            VERBOSE=true
+        -d|--detach)
+            DETACH=true
             shift
             ;;
         -rd|--remove-data)
@@ -38,7 +38,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             log_error "Unknown option: $1"
-            echo "Usage: $0 [-v|--verbose]"
+            echo "Usage: $0 [-d|--detach] [-rd|--remove-data]"
             exit 1
             ;;
     esac
@@ -114,11 +114,8 @@ app() {
 
     log_info "Starting services with $CONTAINER_RUNTIME..."
 
-    if [ "$VERBOSE" = true ]; then
+    if [ "$DETACH" = true ]; then
 
-        $COMPOSE_CMD up
-        exit 0
-    else
         # Run in detached mode (no logs)
         $COMPOSE_CMD up -d
         sleep 3
@@ -136,6 +133,10 @@ app() {
             sleep 10 &
             wait $!
         done
+    else
+        
+        $COMPOSE_CMD up
+        exit 0
     fi
 }
 
