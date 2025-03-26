@@ -1,0 +1,4 @@
+This directory is used as the data directory for containers.
+
+- Do not edit or delete any files or subdirectories within this directory.
+- Modifying or removing content may cause unexpected behavior or data loss in containerized applications.

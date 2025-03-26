@@ -1,6 +1,73 @@
-<div align="center" >
-<img src="src/images/icon.png" width="200">
-<h1>SDMP<br/><h2>Student DataBase Management Portal</h2></h1>
-<p>Student record management system built with PHP and MySQL</p>
+<div align="center">
+<img src="app/src/images/icon.png" width="150">
+<h1>SDMP</h1>
+<h2>Student Database Management Portal</h2>
+<p>A student record management system built with PHP and PostgreSQL</p>
 </div>
-<br/>
+
+
+## 📑 Overview
+
+SDMP (Student Database Management Portal) is a web application designed to manage student records efficiently. It provides an intuitive interface for administrators and teachers to maintain student data, track academic progress, and generate reports.  
+
+This project is being developed as a college submission assignment.
+
+
+## ✨ Features
+
+- **User Authentication**: Secure login system with role-based access control
+- **User Management**: Admin panel to manage user accounts and permissions
+- **Student Records**: Comprehensive management of student personal and academic information
+- **Search & Filter**: Advanced search capabilities to find student records quickly
+
+
+## 🛠️ Technologies Used
+
+- **Backend**: PHP
+- **Database**: PostgreSQL
+- **Frontend**: HTML, Bootstrap
+- **Containerization**: Podman/Docker & Compose
+
+
+## 🚀 Installation
+
+### Prerequisites
+
+- Podman/Docker and Podman/Docker Compose
+- Git
+
+### Setup Instructions
+
+1. Clone the repository
+
+   ```shell
+   git clone https://github.com/soymadip/SDMP
+   cd SDMP
+   ```
+2. Edit the [.env](./.env) file with the required values.
+
+3. Run the setup:
+
+   ```shell
+   ./run
+   ```
+4. Access the application at:
+   ```shell
+   http://localhost:8080
+   ```
+
+5. Also for,
+   - **pgAdmin**: `http://localhost:5050`
+   - **SQL Server**: `http://localhost:5432`
+
+
+## 📊 App Configuration
+
+The configuration file can be found in `app/config.php`.
+
+
+## 🙏 Credits 
+
+<!-- ai generated -->
+- Bootstrap Team for their excellent CSS framework
+- PostgreSQL community for the robust database system

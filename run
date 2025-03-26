@@ -1,92 +1,163 @@
 #!/bin/bash
 
-set -a
-[ -f .env ] && source .env
-set +a
+set -e
 
-PROJECT_NAME="SDMP"
-COMPOSE_FILE="docker-compose.yml"
+DATA_DIR="./data"
+POSTGRES_DATA_DIR="${DATA_DIR}/postgres"
+PGADMIN_DATA_DIR="${DATA_DIR}/pgadmin"
+APP_DIR="./app"
 
-# Colors
-GREEN="\033[1;32m"
-YELLOW="\033[1;33m"
-RED="\033[1;31m"
-NC="\033[0m"
+# Color codes
+BLUE="\e[34m"
+YELLOW="\e[33m"
+RED="\e[31m"
+MAGENTA="\e[35m"
+NC="\e[0m"
+
+# ------------------------------------------------
+
+clear 
 
 # Logging functions
-info() {
-  echo -e "${GREEN}[INFO]${NC} $1"
-}
-warn() {
-  echo -e "${YELLOW}[WARN]${NC} $1"
-}
-error() {
-  echo -e "${RED}[ERROR]${NC} $1"
-}
+log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
+log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+log_done() { echo -e "${MAGENTA}[INFO] $1${NC}"; }
 
-#
-# Detect if Docker or Podman should be used
-if [ -n "$1" ]; then
-  CONTAINER_RUNTIME="$1"
-elif [ -n "$CONTAINER_RUNTIME" ]; then
-  info "Using CONTAINER_RUNTIME from .env: $CONTAINER_RUNTIME"
-else
-  if command -v podman >/dev/null 2>&1; then
-    CONTAINER_RUNTIME="podman"
-  elif command -v docker >/dev/null 2>&1; then
-    CONTAINER_RUNTIME="docker"
-  else
-    error "Neither Docker nor Podman is installed. Exiting..."
-    exit 1
-  fi
-fi
-
-#
-# Set the correct compose command
-if [ "$CONTAINER_RUNTIME" = "podman" ]; then
-  COMPOSE_CMD="podman-compose"
-elif [ "$CONTAINER_RUNTIME" = "docker" ]; then
-  COMPOSE_CMD="docker compose"
-else
-  error "Invalid container runtime selected: $CONTAINER_RUNTIME"
-  exit 1
-fi
-
-
-# Check & create data directories
-for dir in "data" "data/postgres" "data/pgadmin"; do
-  if [ ! -d "$dir" ]; then
-    warn "$dir not found! Creating..."
-    mkdir -p "$dir"
-    chmod 777 "$dir"
-    info "$dir created."
-  fi
+# Parse command line arguments
+VERBOSE=false
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -v|--verbose)
+            VERBOSE=true
+            shift
+            ;;
+        -rd|--remove-data)
+            REMOVE_DATA=true
+            shift
+            ;;
+        *)
+            log_error "Unknown option: $1"
+            echo "Usage: $0 [-v|--verbose]"
+            exit 1
+            ;;
+    esac
 done
 
-
-info "Starting $PROJECT_NAME using $CONTAINER_RUNTIME..."
-
-# Check if containers are already running
-if $COMPOSE_CMD ps | grep -q "Up"; then
-  info "Containers are already running. Skipping startup..."
+# Detect container runtime
+if command -v podman &>/dev/null; then
+    CONTAINER_RUNTIME="podman"
+elif command -v docker &>/dev/null; then
+    log_warn "Podman not found. Falling back to Docker."
+    CONTAINER_RUNTIME="docker"
 else
-  info "Starting services..."
-  $COMPOSE_CMD up -d
-
-  if [ $? -ne 0 ]; then
-    error "Failed to start services!"
+    log_error "Neither Podman nor Docker is installed."
+    log_info "Install Podman: https://podman.io/getting-started/installation"
+    log_info "Install Docker: https://docs.docker.com/get-docker/"
     exit 1
-  fi
 fi
 
-info "Access your services:"
-echo "   - PHP App:   http://localhost:8080"
-echo "   - pgAdmin:   http://localhost:5050 (Login: ${PGADMIN_DEFAULT_EMAIL:-admin@local.in})"
 
-info "Press Ctrl+C to stop all services..."
+# Detect compose tool
+if [ "$CONTAINER_RUNTIME" = "podman" ]; then
+    if command -v podman-compose &>/dev/null; then
+        COMPOSE_CMD="podman-compose"
+    else
+        log_error "Podman is selected, but podman-compose is not installed."
+        log_info "Install podman-compose: pip install podman-compose"
+        exit 1
+    fi
+else
+    if command -v docker compose &>/dev/null; then
+        COMPOSE_CMD="docker compose"
+    elif command -v docker-compose &>/dev/null; then
+        COMPOSE_CMD="docker-compose"
+    else
+        log_error "Docker is selected, but neither 'docker compose' nor 'docker-compose' is installed."
+        log_info "Install Docker Compose: https://docs.docker.com/compose/install/"
+        exit 1
+    fi
+fi
 
-# Ensure services stop when user exits
-trap '$COMPOSE_CMD down; info "Services stopped. Exiting..."; exit 0' SIGINT
 
-# Keep script running until interrupted
-while true; do sleep 1; done
+# Load environment variables from .env
+if [ -f .env ]; then
+    log_info "Loading environment variables from .env..."
+    set -a
+    source .env
+    set +a
+else
+    log_warn ".env file not found! Some environment variables may be missing."
+fi
+
+
+# Ensure required directories exist
+log_info "Setting up directories..."
+mkdir -p "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR"
+cp assets/DO_NOT_EDIT "$DATA_DIR/"
+
+# Fix ownership (for Podman)
+if [ "$CONTAINER_RUNTIME" = "podman" ]; then
+    log_info "Fixing permissions for Podman..."
+    $CONTAINER_RUNTIME unshare chown -R 70:70 "$POSTGRES_DATA_DIR"
+    $CONTAINER_RUNTIME unshare chown -R 5050:5050 "$PGADMIN_DATA_DIR"
+fi
+
+# Fix SELinux labels (if applicable)
+if command -v getenforce &>/dev/null && [ "$(getenforce)" != "Disabled" ]; then
+    log_info "Adjusting SELinux labels..."
+    chcon -Rt container_file_t "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR" || log_warn "SELinux adjustment failed, continuing..."
+fi
+
+
+app() {
+
+    log_info "Starting services with $CONTAINER_RUNTIME..."
+
+    if [ "$VERBOSE" = true ]; then
+
+        $COMPOSE_CMD up
+        exit 0
+    else
+        # Run in detached mode (no logs)
+        $COMPOSE_CMD up -d
+        sleep 3
+        
+        echo 
+        log_info "Services running in background."
+        log_info "Access your services:"
+        echo -e "        - PHP App:    http://localhost:8080"
+        echo -e "        - SQL server: http://localhost:5432"
+        echo -e "        - pgAdmin:    http://localhost:5050 (Login: ${PGADMIN_DEFAULT_EMAIL})\n"
+
+        log_done "Press Ctrl+C to stop all services."
+        
+        while true; do
+            sleep 10 &
+            wait $!
+        done
+    fi
+}
+
+
+stop() {
+    echo
+    log_info "Stopping services..."
+    $COMPOSE_CMD down
+    
+    if [ "$REMOVE_DATA" = true ]; then
+        log_info "Removing data directories..."
+        rm -rf "$DATA_DIR"
+    fi
+
+    echo
+    log_done "Services stopped. Bye!"
+    exit 0
+}
+
+# Set up signal handling
+trap stop INT TERM
+
+# Start app
+app
+
