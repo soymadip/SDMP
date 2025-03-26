@@ -2,16 +2,12 @@
 
 set -e
 
-DATA_DIR="./data"
-POSTGRES_DATA_DIR="${DATA_DIR}/postgres"
-PGADMIN_DATA_DIR="${DATA_DIR}/pgadmin"
-APP_DIR="./app"
-
 # Color codes
 BLUE="\e[34m"
 YELLOW="\e[33m"
 RED="\e[31m"
 MAGENTA="\e[35m"
+GREEN="\e[32m"
 NC="\e[0m"
 
 # ------------------------------------------------
@@ -23,9 +19,11 @@ log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 log_done() { echo -e "${MAGENTA}[INFO] $1${NC}"; }
+log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 
 # Parse command line arguments
 DETACH=false
+REMOVE_DATA=false
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -d|--detach)
@@ -36,9 +34,18 @@ while [[ $# -gt 0 ]]; do
             REMOVE_DATA=true
             shift
             ;;
+        -h|--help)
+            echo "Usage: $0 [-d|--detach] [-rd|--remove-data] [-h|--help]"
+            echo ""
+            echo "Options:"
+            echo "  -d, --detach       Run in detached mode"
+            echo "  -rd, --remove-data Remove data directories when stopping"
+            echo "  -h, --help         Show this help message"
+            exit 0
+            ;;
         *)
             log_error "Unknown option: $1"
-            echo "Usage: $0 [-d|--detach] [-rd|--remove-data]"
+            echo "Usage: $0 [-d|--detach] [-rd|--remove-data] [-h|--help]"
             exit 1
             ;;
     esac
@@ -94,19 +101,25 @@ fi
 # Ensure required directories exist
 log_info "Setting up directories..."
 mkdir -p "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR"
-cp assets/DO_NOT_EDIT "$DATA_DIR/"
+
+# Create DO_NOT_EDIT file if it doesn't exist
+if [ -f assets/DO_NOT_EDIT ]; then
+    cp assets/DO_NOT_EDIT "$DATA_DIR/" || log_warn "Could not copy DO_NOT_EDIT file"
+else
+    echo "This directory is managed by SDMP. Do not edit manually!" > "$DATA_DIR/DO_NOT_EDIT"
+fi
 
 # Fix ownership (for Podman)
 if [ "$CONTAINER_RUNTIME" = "podman" ]; then
     log_info "Fixing permissions for Podman..."
-    $CONTAINER_RUNTIME unshare chown -R 70:70 "$POSTGRES_DATA_DIR"
-    $CONTAINER_RUNTIME unshare chown -R 5050:5050 "$PGADMIN_DATA_DIR"
+    $CONTAINER_RUNTIME unshare chown -R 70:70 "$POSTGRES_DATA_DIR" 2>/dev/null || log_warn "Could not set postgres directory permissions"
+    $CONTAINER_RUNTIME unshare chown -R 5050:5050 "$PGADMIN_DATA_DIR" 2>/dev/null || log_warn "Could not set pgadmin directory permissions"
 fi
 
 # Fix SELinux labels (if applicable)
 if command -v getenforce &>/dev/null && [ "$(getenforce)" != "Disabled" ]; then
     log_info "Adjusting SELinux labels..."
-    chcon -Rt container_file_t "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR" || log_warn "SELinux adjustment failed, continuing..."
+    chcon -Rt container_file_t "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR" 2>/dev/null || log_warn "SELinux adjustment failed, continuing..."
 fi
 
 

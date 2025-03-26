@@ -4,16 +4,15 @@ $DEBUG_MODE = true;
 
 
 // Database configuration
-$db_host = 'localhost';
-$db_user = 'root';
-$db_pass = '';
-$db_name = 'SDMP';
+$db_host = 'postgres';
+$db_user = getenv('POSTGRES_USER') ?: 'root';
+$db_pass = getenv('POSTGRES_PASSWORD') ?: '';
+$db_name = getenv('POSTGRES_DB') ?: 'SDMP';
 
+// Detect base URL automatically - works in container or local environment
+$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
 
-// $hostUrl = 'http://localhost/sdmp';
-$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . '/sdmp';
-
-$hostPath = dirname(__DIR__) . '/sdmp';
+$hostPath = dirname(__DIR__);
 
 
 // Master Users (Have access to all things)

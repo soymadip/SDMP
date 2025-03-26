@@ -1,9 +1,14 @@
 version: "3.9"
 
+networks:
+  sdmp-network:
+    name: sdmp-network
+    driver: bridge
+
 services:
   postgres:
     image: postgres:17.4
-    container_name: postgres_csmp
+    container_name: sdmp-db
     restart: always
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
@@ -19,10 +24,12 @@ services:
       interval: 8s
       timeout: 5s
       retries: 4
+    networks:
+      - sdmp-network
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin_csmp
+    container_name: sdmp-pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
@@ -34,22 +41,31 @@ services:
         condition: service_healthy
     volumes:
       - ./data/pgadmin:/var/lib/pgadmin
-    healthcheck:
-      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:80/misc/ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+    networks:
+      - sdmp-network
 
-  # app:
-  #   image: php:8.4.5-apache
-  #   container_name: sdmp
-  #   restart: always
-  #   ports:
-  #     - "8080:80"
-  #   volumes:
-  #     - ./app:/var/www/html
-  #   depends_on:
-  #     - postgres
-  #   environment:
-  #     - APACHE_DOCUMENT_ROOT=/var/www/html
+  app:
+    image: php:8.4.5-apache
+    container_name: sdmp
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/var/www/html
+    depends_on:
+      - postgres
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - DB_HOST=postgres
+    command: >
+      bash -c "apt-get update && 
+      apt-get install -y libpq-dev && 
+      docker-php-ext-install pdo pdo_pgsql pgsql && 
+      a2enmod rewrite && 
+      apache2-foreground"
+    networks:
+      - sdmp-network
+
