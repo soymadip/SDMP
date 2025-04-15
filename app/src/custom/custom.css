@@ -1,88 +1,170 @@
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Roboto:wght@400;700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:opsz,wght@18..144,700&display=swap');
+@import url('./color.css');
 
-:root {
-  --grey1: #343a40;
+/* --------------- Dev Notice Styles ----------------------*/
+.dev-notice-float {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #dc3545;
+    color: white;
+    padding: 0 12px;
+    height: 36px;
+    border-radius: 18px;
+    font-size: 0.95rem;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: pulse 2s infinite;
+    min-width: 100px;
 }
 
-.navbar {
-  background-color: var(--grey1);
+.dev-notice-float:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px);
+    padding: 0 28px 0 15px;
+    animation: none;
+    min-width: 130px;
 }
 
-.navbar-nav .nav-link {
-  margin-right: 1rem;
+.dev-notice-float .bi {
+    margin-right: 8px;
+    flex-shrink: 0;
 }
 
-.small-icon {
-  font-size: 0.875em;
+.text-container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    width: calc(100% - 20px);
 }
 
-.div-index {
-  height: 85vh;
+.dev-notice-text {
+    white-space: nowrap;
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.log {
-  background-color: var(--grey1);
+.hint-text {
+    position: absolute;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease-out;
+    pointer-events: none;
+    left: 0;
 }
 
-.abd {
-  background-color: var(--grey1);
+.dev-notice-float:hover .dev-notice-text {
+    opacity: 0;
+    transform: translateY(-20px);
 }
 
-.spinner-border {
-  width: 3.5rem;
-  height: 3.5rem;
+.dev-notice-float:hover .hint-text {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
 
-.mrnwthr {
-  font-family: "Merriweather", serif;
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.6); }
+    70% { box-shadow: 0 0 0 6px rgba(220, 53, 69, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
 }
 
-.nfont {
-  font-family: serif;
+@media (max-width: 768px) {
+    .dev-notice-float {
+        height: 32px;
+        font-size: 0.85rem;
+        bottom: 15px;
+        right: 15px;
+    }
 }
 
-.serif-font {
-  font-family: serif;
+.tap-hint {
+    display: none;
 }
 
-.roboto-font {
-  font-family: "Roboto", sans-serif;
+
+/* --------------------- 404 Error Page Styles ---------------------- */
+.error-container {
+    text-align: center;
+    padding: 60px 15px;
 }
 
-.show-password {
-  font-size: 0.75em;
-  color: #6c757d;
+.error-code {
+    font-size: 8rem;
+    font-weight: 700;
+    color: var(--bs-danger);
 }
 
-.form-control:focus {
-  box-shadow: none !important;
-  border-color: #ced4da;
+.error-message {
+    font-size: 1.5rem;
+    margin-bottom: 30px;
 }
 
-::placeholder {
-  color: #6c757d;
-  opacity: 0.6 !important;
+
+/* --------------------- Navbar Styles ---------------------- */
+
+.dropdown-menu {
+    background-color: var(--bs-secondary-bg);
+}
+.custom-navbar {
+    background-color: var(--bs-body-bg) !important;
+    box-shadow: none !important;
 }
 
-.form-select:focus {
-  box-shadow: none !important;
-  border-color: #ced4da;
+.custom-navbar .navbar-brand {
+    font-family: 'Merriweather', serif;
+    font-weight: 700;
+    padding-top: 0.3rem;
+    margin-top: 0.1rem;
+    position: relative;
 }
 
-.text-nowrap {
-  white-space: nowrap;
+.custom-navbar img.d-inline-block {
+    padding-top: 0;
+    margin-top: -4.5px;
 }
 
-.display-4 {
-  font-weight: 700;
-  color: #d63511;
+.nav-version {
+    font-family: "Roboto", sans-serif !important;
+    font-size: 16px !important;
+    opacity: 60%;
+    vertical-align: middle;
 }
 
-#togglePassword {
-  cursor: pointer;
+.custom-navbar .fas,
+.custom-navbar .dropdown-menu .fas {
+    font-size: 0.85em;
 }
 
-.hidden {
-  display: none;
+/* --------------------- Status Page Styles ---------------------- */
+.system-status-indicator {
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.status-card .card-body {
+    padding: 1.5rem;
+}
+
+@keyframes status-pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.system-status-indicator i {
+    animation: status-pulse 2s infinite;
+}
+
+.nav-version {
+    font-family: "Roboto", sans-serif !important;
+    font-size: 16px !important;
+    opacity: 60%;
 }

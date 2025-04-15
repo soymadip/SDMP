@@ -12,7 +12,7 @@ NC="\e[0m"
 
 # ------------------------------------------------
 
-clear 
+clear
 
 # Logging functions
 log_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
@@ -25,78 +25,75 @@ log_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 DETACH=false
 REMOVE_DATA=false
 while [[ $# -gt 0 ]]; do
-    case "$1" in
-        -d|--detach)
-            DETACH=true
-            shift
-            ;;
-        -rd|--remove-data)
-            REMOVE_DATA=true
-            shift
-            ;;
-        -h|--help)
-            echo "Usage: $0 [-d|--detach] [-rd|--remove-data] [-h|--help]"
-            echo ""
-            echo "Options:"
-            echo "  -d, --detach       Run in detached mode"
-            echo "  -rd, --remove-data Remove data directories when stopping"
-            echo "  -h, --help         Show this help message"
-            exit 0
-            ;;
-        *)
-            log_error "Unknown option: $1"
-            echo "Usage: $0 [-d|--detach] [-rd|--remove-data] [-h|--help]"
-            exit 1
-            ;;
-    esac
+  case "$1" in
+  -d | --detach)
+    DETACH=true
+    shift
+    ;;
+  -rd | --remove-data)
+    REMOVE_DATA=true
+    shift
+    ;;
+  -h | --help)
+    echo "Usage: $0 [-d|--detach] [-rd|--remove-data] [-h|--help]"
+    echo ""
+    echo "Options:"
+    echo "  -d, --detach       Run in detached mode"
+    echo "  -rd, --remove-data Remove data directories when stopping"
+    echo "  -h, --help         Show this help message"
+    exit 0
+    ;;
+  *)
+    log_error "Unknown option: $1"
+    echo "Usage: $0 [-d|--detach] [-rd|--remove-data] [-h|--help]"
+    exit 1
+    ;;
+  esac
 done
 
 # Detect container runtime
 if command -v podman &>/dev/null; then
-    CONTAINER_RUNTIME="podman"
+  CONTAINER_RUNTIME="podman"
 elif command -v docker &>/dev/null; then
-    log_warn "Podman not found. Falling back to Docker."
-    CONTAINER_RUNTIME="docker"
+  log_warn "Podman not found. Falling back to Docker."
+  CONTAINER_RUNTIME="docker"
 else
-    log_error "Neither Podman nor Docker is installed."
-    log_info "Install Podman: https://podman.io/getting-started/installation"
-    log_info "Install Docker: https://docs.docker.com/get-docker/"
-    exit 1
+  log_error "Neither Podman nor Docker is installed."
+  log_info "Install Podman: https://podman.io/getting-started/installation"
+  log_info "Install Docker: https://docs.docker.com/get-docker/"
+  exit 1
 fi
-
 
 # Detect compose tool
 if [ "$CONTAINER_RUNTIME" = "podman" ]; then
-    if command -v podman-compose &>/dev/null; then
-        COMPOSE_CMD="podman-compose"
-    else
-        log_error "Podman is selected, but podman-compose is not installed."
-        log_info "Install podman-compose: pip install podman-compose"
-        exit 1
-    fi
+  if command -v podman-compose &>/dev/null; then
+    COMPOSE_CMD="podman-compose"
+  else
+    log_error "Podman is selected, but podman-compose is not installed."
+    log_info "Install podman-compose: pip install podman-compose"
+    exit 1
+  fi
 else
-    if command -v docker compose &>/dev/null; then
-        COMPOSE_CMD="docker compose"
-    elif command -v docker-compose &>/dev/null; then
-        COMPOSE_CMD="docker-compose"
-    else
-        log_error "Docker is selected, but neither 'docker compose' nor 'docker-compose' is installed."
-        log_info "Install Docker Compose: https://docs.docker.com/compose/install/"
-        exit 1
-    fi
+  if command -v docker compose &>/dev/null; then
+    COMPOSE_CMD="docker compose"
+  elif command -v docker-compose &>/dev/null; then
+    COMPOSE_CMD="docker-compose"
+  else
+    log_error "Docker is selected, but neither 'docker compose' nor 'docker-compose' is installed."
+    log_info "Install Docker Compose: https://docs.docker.com/compose/install/"
+    exit 1
+  fi
 fi
-
 
 # Load environment variables from .env
 if [ -f .env ]; then
-    log_info "Loading environment variables from .env..."
-    set -a
-    source .env
-    set +a
+  log_info "Loading environment variables from .env..."
+  set -a
+  source .env
+  set +a
 else
-    log_warn ".env file not found! Some environment variables may be missing."
+  log_warn ".env file not found! Some environment variables may be missing."
 fi
-
 
 # Ensure required directories exist
 log_info "Setting up directories..."
@@ -104,69 +101,67 @@ mkdir -p "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR"
 
 # Create DO_NOT_EDIT file if it doesn't exist
 if [ -f assets/DO_NOT_EDIT ]; then
-    cp assets/DO_NOT_EDIT "$DATA_DIR/" || log_warn "Could not copy DO_NOT_EDIT file"
+  cp assets/DO_NOT_EDIT "$DATA_DIR/" || log_warn "Could not copy DO_NOT_EDIT file"
 else
-    echo "This directory is managed by SDMP. Do not edit manually!" > "$DATA_DIR/DO_NOT_EDIT"
+  echo "This directory is managed by SDMP. Do not edit manually!" >"$DATA_DIR/DO_NOT_EDIT"
 fi
 
 # Fix ownership (for Podman)
 if [ "$CONTAINER_RUNTIME" = "podman" ]; then
-    log_info "Fixing permissions for Podman..."
-    $CONTAINER_RUNTIME unshare chown -R 70:70 "$POSTGRES_DATA_DIR" 2>/dev/null || log_warn "Could not set postgres directory permissions"
-    $CONTAINER_RUNTIME unshare chown -R 5050:5050 "$PGADMIN_DATA_DIR" 2>/dev/null || log_warn "Could not set pgadmin directory permissions"
+  log_info "Fixing permissions for Podman..."
+  $CONTAINER_RUNTIME unshare chown -R 70:70 "$POSTGRES_DATA_DIR" 2>/dev/null || log_warn "Could not set postgres directory permissions"
+  $CONTAINER_RUNTIME unshare chown -R 5050:5050 "$PGADMIN_DATA_DIR" 2>/dev/null || log_warn "Could not set pgadmin directory permissions"
 fi
 
 # Fix SELinux labels (if applicable)
 if command -v getenforce &>/dev/null && [ "$(getenforce)" != "Disabled" ]; then
-    log_info "Adjusting SELinux labels..."
-    chcon -Rt container_file_t "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR" 2>/dev/null || log_warn "SELinux adjustment failed, continuing..."
+  log_info "Adjusting SELinux labels..."
+  chcon -Rt container_file_t "$POSTGRES_DATA_DIR" "$PGADMIN_DATA_DIR" "$APP_DIR" 2>/dev/null || log_warn "SELinux adjustment failed, continuing..."
 fi
-
 
 app() {
 
-    log_info "Starting services with $CONTAINER_RUNTIME..."
+  log_info "Starting services with $CONTAINER_RUNTIME..."
 
-    if [ "$DETACH" = true ]; then
+  if [ "$DETACH" = true ]; then
 
-        # Run in detached mode (no logs)
-        $COMPOSE_CMD up -d
-        sleep 3
-        
-        echo 
-        log_info "Services running in background."
-        log_info "Access your services:"
-        echo -e "        - PHP App:    http://localhost:8080"
-        echo -e "        - SQL server: http://localhost:5432"
-        echo -e "        - pgAdmin:    http://localhost:5050 (Login: ${PGADMIN_DEFAULT_EMAIL})\n"
+    # Run in detached mode (no logs)
+    $COMPOSE_CMD up -d
+    sleep 3
 
-        log_done "Press Ctrl+C to stop all services."
-        
-        while true; do
-            sleep 10 &
-            wait $!
-        done
-    else
-        
-        $COMPOSE_CMD up
-        exit 0
-    fi
+    echo
+    log_info "Services running in background."
+    log_info "Access your services:"
+    echo -e "        - PHP App:    http://localhost:8080"
+    echo -e "        - SQL server: http://localhost:5432"
+    echo -e "        - pgAdmin:    http://localhost:5050 (Login: ${PGADMIN_DEFAULT_EMAIL})\n"
+
+    log_done "Press Ctrl+C to stop all services."
+
+    while true; do
+      sleep 10 &
+      wait $!
+    done
+  else
+
+    $COMPOSE_CMD up
+    exit 0
+  fi
 }
 
-
 stop() {
-    echo
-    log_info "Stopping services..."
-    $COMPOSE_CMD down
-    
-    if [ "$REMOVE_DATA" = true ]; then
-        log_info "Removing data directories..."
-        rm -rf "$DATA_DIR"
-    fi
+  echo
+  log_info "Stopping services..."
+  $COMPOSE_CMD down
 
-    echo
-    log_done "Services stopped. Bye!"
-    exit 0
+  if [ "$REMOVE_DATA" = true ]; then
+    log_info "Removing data directories..."
+    rm -rf "$DATA_DIR"
+  fi
+
+  echo
+  log_done "Services stopped. Bye!"
+  exit 0
 }
 
 # Set up signal handling
@@ -174,4 +169,3 @@ trap stop INT TERM
 
 # Start app
 app
-

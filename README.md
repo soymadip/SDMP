@@ -47,24 +47,22 @@ This project is being developed as my college's major-project submission.
    ```
 2. Edit the [.env](./.env) file with the required values.
 
-3. Run the setup:
+3. Adjust application config in [`app/config.php`](./app/config.php).
+
+4. Run the setup:
 
    ```shell
    ./run
    ```
-4. Access the application at:
+5. Access the application at:
    ```shell
    http://localhost:8080
    ```
 
-5. Also for,
+6. Also for,
    - **pgAdmin**: `http://localhost:5050`
    - **SQL Server**: `http://localhost:5432`
 
-
-## 📊 App Configuration
-
-The configuration file can be found in `app/config.php`.
 
 
 ## 🙏 Credits 

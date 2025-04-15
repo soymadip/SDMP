@@ -1,33 +1,22 @@
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-<?php 
-
-include_once dirname(__DIR__) . '/config.php';
-
-// check if directly excluded or not.
-if (basename($_SERVER['PHP_SELF']) == 'head.php') {
-
-  $SiteTitle = 'No Permission';
-
-  $npTxt = 'This page is not meant to accessed directly.';
-  include_once 'no-permission.php';
-}
+<?php
+// Include configuration with absolute path
+require_once dirname(__DIR__) . '/config.php';
 ?>
 
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><?php echo $siteTitle . ' | '. $siteShortName?></title>
+
 <!-- Favicon links -->
-<link rel="icon" href="<?php echo $FvcnPath ?>/favicon.ico" type="image/x-icon" />
-<link rel="apple-touch-icon" sizes="180x180" href="<?php echo $FvcnPath ?>/apple-touch-icon.png" />
-<link rel="icon" type="image/png" sizes="32x32" href="<?php echo $FvcnPath ?>/favicon-32x32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="<?php echo $FvcnPath ?>/favicon-16x16.png" />
-<link rel="manifest" href="<?php echo $FvcnPath ?>/site.webmanifest" />
+<link rel="icon" href="<?php echo $fvcnUrl ?>/favicon.ico" type="image/x-icon" />
+<link rel="apple-touch-icon" sizes="180x180" href="<?php echo $fvcnUrl ?>/apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="<?php echo $fvcnUrl ?>/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="<?php echo $fvcnUrl ?>/favicon-16x16.png" />
+<link rel="manifest" href="<?php echo $fvcnUrl ?>/site.webmanifest" />
 
-<!-- Link to Bootstrap & custom CSS -->
-<link rel="stylesheet" href="<?php echo $BtpCss ?>" />
-<link rel="stylesheet" href="<?php echo $CstmCss ?>" />
-
-<!-- Link Bootstrap & Custom JS -->
-<script src="<?php echo $BtpJs ?>"></script>
-<script src="<?php echo $CstmJs ?>"></script>
-
-<title><?php echo $SiteTitle . ' | '. $SiteShortName?></title>
+<!-- Link to Bootstrap CSS, Icons & Font Awesome -->
+<link rel="stylesheet" href="<?php echo $btpCss ?>" />
+<link rel="stylesheet" href="<?php echo $btpIcn ?>" /> 
+<link rel="stylesheet" href="<?php echo $faIcn ?>" /> 
+<link rel="stylesheet" href="<?php echo $cstmCss ?>" />
