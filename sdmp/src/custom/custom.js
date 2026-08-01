@@ -69,7 +69,7 @@ function showUserTypeModal() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-  var element = document.querjSelector("#togglePassword");
+  var element = document.querySelector("#togglePassword");
   if (element) {
     element.addEventListener("click", togglePassword);
   }

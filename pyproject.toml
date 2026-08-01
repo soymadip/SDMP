@@ -1,0 +1,21 @@
+[project]
+name = "SDMP"
+version = "0.2.0"
+description = "Student Database Management Portal"
+readme = "README.md"
+authors = [
+    { name = "Soumadip Das", email = "soumadip+github@zohomail.in" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.141.1",
+    "pymysql>=1.2.0",
+    "sqlalchemy>=2.0.52",
+]
+
+[build-system]
+requires = ["uv_build>=0.12.7,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""

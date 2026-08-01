@@ -1,0 +1,31 @@
+[tools]
+prettier = "latest"
+ruff = "latest"
+uv = "latest"
+
+[env]
+_.file = ".env"
+
+[tasks]
+sync = "uv sync"
+
+start-db = { run = "podman compose up --remove-orphans -d"}
+start-db-d = { run = "podman compose up --remove-orphans -d --wait", hide = true }
+
+stop-db = { run = "podman compose down"}
+
+[tasks.dev]
+description = "Run the development server"
+depends = ["start-db-d"]
+run = """
+trap 'podman compose down' EXIT INT TERM
+fastapi dev sdmp --port $SDMP_APP_PORT
+"""
+
+[tasks.start]
+description = "Run the production server"
+depends = ["start-db-d"]
+run = """
+trap 'podman compose down' EXIT INT TERM
+uv run fastapi run sdmp --port $SDMP_APP_PORT
+"""

@@ -1,75 +1,61 @@
-networks:
-  sdmp-network:
-    name: sdmp-network
-    driver: bridge
-
-volumes:
-  phpmyadmin_sessions:
-
 services:
-  mariadb:
+  db:
     image: mariadb:latest
-    container_name: sdmp-mariadb
-    restart: always
-    environment:
-      MARIADB_USER: "${MARIADB_USER}"
-      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
-      MARIADB_ROOT_PASSWORD: "${MARIADB_PASSWORD}"
-      MARIADB_DATABASE: "${MARIADB_DATABASE}"
-    volumes:
-      - ./data/mariadb:/var/lib/mysql
-      - ./database/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
-      start_period: 3s
-      interval: 8s
-      timeout: 5s
-      retries: 4
-    networks:
-      - sdmp-network
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
 
-  phpmyadmin:
-    image: phpmyadmin:latest
-    container_name: sdmp-phpmyadmin
+  dbx:
+    image: t8y2/dbx:latest
     restart: always
-    environment:
-      PMA_HOST: mariadb
-      PMA_PORT: 3306
-    ports:
-      - "${PHPMYADMIN_PORT:-5050}:80"
     depends_on:
-      mariadb:
-        condition: service_healthy
-    volumes:
-      - phpmyadmin_sessions:/sessions
-    networks:
-      - sdmp-network
-
-  app:
-    image: php:8.4.5-apache
-    container_name: sdmp
-    restart: always
+      - db
     ports:
-      - "9000:80"
-    volumes:
-      - ./app:/var/www/html
-    depends_on:
-      mariadb:
-        condition: service_healthy
+      - "4224:4224"
+    extra_hosts:
+      - "host.local:host-gateway"
     environment:
-      - APACHE_DOCUMENT_ROOT=/var/www/html
-      - MARIADB_USER=${MARIADB_USER}
-      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
-      - MARIADB_DATABASE=${MARIADB_DATABASE}
-      - DB_HOST=mariadb
-      - APP_DEBUG=${APP_DEBUG:-false}
-    command: >
-      bash -c "apt-get update && 
-      docker-php-ext-install pdo pdo_mysql &&
-      a2enmod rewrite && 
-      apache2-foreground"
-    networks:
-      - sdmp-network
+      DBX_DISABLE_PASSWORD: 1
+    volumes:
+      - dbx_data:/app/data
 
+  # app:
+  #   build:
+  #     context: .
+  #     target: runner
+  #   image: sdmp-app:0.2.0
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     - DB_HOST=db
+  #     - DB_PORT=3306
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD-SHELL",
+  #         'python3 -c ''import urllib.request; urllib.request.urlopen("http://localhost:8000/health")''',
+  #       ]
+  #     interval: 15s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 10s
+
+volumes:
+  mariadb_data:
+  dbx_data:

@@ -1,43 +1,43 @@
 <div align="center">
-<img src="app/src/images/icon.png" width="150">
+<img src="./sdmp/src/img/icon.png" width="150">
 <h1>SDMP
 </br>
 Student Database Management Portal</h1>
+
+SDMP is a web application designed to manage student records efficiently.  
+It provides interface for administrators and college stuff to maintain student data, track academic progress, and generate reports.
 </div>
 <br>
 
-
-## 📑 Overview
-
-SDMP (Student Database Management Portal) is a web application designed to manage student records efficiently. It provides an intuitive interface for administrators and teachers to maintain student data, track academic progress, and generate reports.  
-
-This project is being developed as my college's major-project submission.
-
-
-## ✨ Features
+# ✨ Features
 
 - **User Authentication**: Secure login system with role-based access control
 - **User Management**: Admin panel to manage user accounts and permissions
 - **Student Records**: Comprehensive management of student personal and academic information
 - **Search & Filter**: Advanced search capabilities to find student records quickly
 
+</br>
 
-## 🛠️ Technologies Used
+# 🚀 Installation
 
-- **Backend**: PHP
-- **Database**: MariaDB
-- **Frontend**: HTML, Bootstrap
-- **Containerization**: Podman/Docker & Compose
+> [!WARNING]
+> This project is still under early development and contains bugs & incomplete features.  
+> Please do not use it in production environments.
 
-
-## 🚀 Installation
+## Setup
 
 ### Prerequisites
 
-- Podman/Docker and Podman/Docker Compose
+- [Podman](https://podman.io)(recommended) / Docker
+- [Podman Compose](https://github.com/containers/podman-compose) / Docker Compose
+- [mise](https://mise.jdx.dev)
 - Git
 
-### Setup Instructions
+### For Now
+
+As this is app is under development, setup is not yet streamlined.
+
+<!--## With Containers (Docker/Podman)-->
 
 1. Clone the repository
 
@@ -45,49 +45,43 @@ This project is being developed as my college's major-project submission.
    git clone https://github.com/soymadip/SDMP
    cd SDMP
    ```
-2. Edit the [.env](./.env) file with the required values.
 
-3. Run the setup:
+2. **Copy & Edit the .env file with the required values.**
 
-   ```shell
-   ./run --detach
-   ```
-4. Access the application at:
-   ```shell
-   http://localhost:9000
+   ```sh
+   cp .env.example .env
+   nano .env
    ```
 
-5. Also for,
-   - **phpMyAdmin**: `http://localhost:8080`
-   - **MariaDB**: `localhost:3306` (database server, not a web page)
+3. Start The app: `mise run start`
 
-### phpMyAdmin Login
+## Access
 
-Use these values on the phpMyAdmin login page:
+- **App**: [localhost:9000](http://localhost:9000)
+- **DBX**: [localhost:4224](http://localhost:4224)
+- **MariaDB**: [localhost:3306](localhost:3306)
 
-- **Server**: `mariadb`
-- **Username**: the value of `MARIADB_USER` in `.env`
-- **Password**: the value of `MARIADB_PASSWORD` in `.env`
-- **Database**: the value of `MARIADB_DATABASE` in `.env`
+## DBX Connection
 
-The default development values are `soymadip` / `soymadip` for username/password and `sdmp` for the database. Change them before deploying publicly.
+To add mariadb connection to DBX:
 
-The development database also includes a highest-privilege account:
+1. Select the `New Connection` option in the center or top-left.
+2. Select `MariaDB` and click Next.
+3. Enter these details:
+   - Connection name: `sdmp`
+   - Host: `host.local`
+   - Port: `3306`
+   - User: value of `MARIADB_USER` in `.env`
+   - Password: value of `MARIADB_PASSWORD` in `.env`
 
-- **Username**: `admin`
-- **Password**: `admin`
-- **User type**: `master`
+# 🛠️ Technologies Used
 
-Change or remove this account before deploying publicly.
+- **Backend**: FastAPI
+- **Database**: MariaDB
+- **Frontend**: HTML, Bootstrap, Jinja2
+- **Containerization**: Podman/Docker & Compose
 
+# 🙏 Credits
 
-## 📊 App Configuration
-
-The configuration file can be found in `app/config.php`.
-
-
-## 🙏 Credits 
-
-<!-- ai generated -->
-- Bootstrap Team for their excellent CSS framework
-- MariaDB community for the robust database system
+- **Bootstrap:** Excellent CSS framework
+- **MariaDB:** The relational DBMS

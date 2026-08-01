@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="container py-4">
+  <h1 class="display-4 text-center">Master Dashboard</h1>
+  <p class="text-center text-muted">System-level administration</p>
+  <div class="row g-3 mt-3">
+    <div class="col-12 col-md-6">
+      <div class="border rounded-3 p-4 h-100">
+        <h2 class="h4">Administration</h2>
+        <p>Manage the application through the administrator dashboard.</p>
+        <a class="btn btn-success" href="/dash/admin">Open admin dashboard</a>
+      </div>
+    </div>
+    <div class="col-12 col-md-6">
+      <div class="border rounded-3 p-4 h-100">
+        <h2 class="h4">Master access</h2>
+        <p class="mb-1">Signed in as:</p>
+        <strong>{{ user.username }}</strong>
+        <p class="mt-3 mb-0 text-muted">Master-only controls can be added here.</p>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}
