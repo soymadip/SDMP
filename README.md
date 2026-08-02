@@ -50,7 +50,7 @@ This project is being developed as my college's major-project submission.
 3. Run the setup:
 
    ```shell
-   ./run
+   ./run --detach
    ```
 4. Access the application at:
    ```shell
@@ -59,7 +59,26 @@ This project is being developed as my college's major-project submission.
 
 5. Also for,
    - **phpMyAdmin**: `http://localhost:8080`
-   - **MariaDB**: `http://localhost:3306`
+   - **MariaDB**: `localhost:3306` (database server, not a web page)
+
+### phpMyAdmin Login
+
+Use these values on the phpMyAdmin login page:
+
+- **Server**: `mariadb`
+- **Username**: the value of `MARIADB_USER` in `.env`
+- **Password**: the value of `MARIADB_PASSWORD` in `.env`
+- **Database**: the value of `MARIADB_DATABASE` in `.env`
+
+The default development values are `soymadip` / `soymadip` for username/password and `sdmp` for the database. Change them before deploying publicly.
+
+The development database also includes a highest-privilege account:
+
+- **Username**: `admin`
+- **Password**: `admin`
+- **User type**: `master`
+
+Change or remove this account before deploying publicly.
 
 
 ## 📊 App Configuration

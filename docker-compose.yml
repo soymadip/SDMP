@@ -3,6 +3,9 @@ networks:
     name: sdmp-network
     driver: bridge
 
+volumes:
+  phpmyadmin_sessions:
+
 services:
   mariadb:
     image: mariadb:latest
@@ -40,7 +43,7 @@ services:
       mariadb:
         condition: service_healthy
     volumes:
-      - ./data/phpmyadmin:/sessions
+      - phpmyadmin_sessions:/sessions
     networks:
       - sdmp-network
 

@@ -50,10 +50,11 @@
 
             $_SESSION['username'] = $username;
             $_SESSION['usertype'] = $user['type'];
-            $_SESSION['dashUrl'] = $hostUrl . '/dash/' . $user['type'].'.php';
+            $dashboardPage = $dashboardPages[$user['type']] ?? $user['type'];
+            $_SESSION['dashUrl'] = $hostUrl . '/dash/' . $dashboardPage . '.php';
             $usertype = $user['type'];
             $spinner_level = 'success';
-            $redirect_url = "../dash/$usertype.php";
+            $redirect_url = "../dash/$dashboardPage.php";
             $redirect_delay = 1500;
 
         } else {

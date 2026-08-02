@@ -18,6 +18,7 @@ $hostPath = __DIR__;
 
 // Master Users (Have access to all things)
 $masterUserType = ['admin', 'master'];
+$dashboardPages = ['master' => 'master'];
 
 
 // Bootstrap CDN assets
