@@ -1,27 +1,28 @@
 <?php
 // Debug mode (enable extra mesages for debugging)
-$DEBUG_MODE = true;
+$DEBUG_MODE = filter_var(getenv('APP_DEBUG') ?: 'false', FILTER_VALIDATE_BOOLEAN);
 
 
 // Database configuration
-$db_host = 'postgres';
-$db_user = getenv('POSTGRES_USER') ?: 'root';
-$db_pass = getenv('POSTGRES_PASSWORD') ?: '';
-$db_name = getenv('POSTGRES_DB') ?: 'SDMP';
+$db_host = getenv('DB_HOST') ?: 'mariadb';
+$db_port = getenv('DB_PORT') ?: '3306';
+$db_user = getenv('MARIADB_USER') ?: 'root';
+$db_pass = getenv('MARIADB_PASSWORD') ?: '';
+$db_name = getenv('MARIADB_DATABASE') ?: 'sdmp';
 
 // Detect base URL automatically - works in container or local environment
-$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+$hostUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
-$hostPath = dirname(__DIR__);
+$hostPath = __DIR__;
 
 
 // Master Users (Have access to all things)
 $masterUserType = ['admin', 'master'];
 
 
-// Bootstrap url/path
-$BtpCss = $hostUrl . '/src/bootstrap/css/bootstrap.min.css';
-$BtpJs = $hostUrl . '/src/bootstrap/js/bootstrap.bundle.min.js'; 
+// Bootstrap CDN assets
+$BtpCss = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css';
+$BtpJs = 'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js';
 
 // Custom css/js url/path
 $CstmCss = $hostUrl . '/src/custom/custom.css';
@@ -38,13 +39,6 @@ $SiteLogo = 'src/images/icon.png';
 
 $SiteVer = 'v0.45';
 
-?>
-
-
-
-<!-- env setup -->
-
-<?php 
 // check if directly excluded or not.
 if (basename($_SERVER['PHP_SELF']) == 'config.php') {
   $npTxt = 'This page is not meant to accessed directly.';
@@ -62,4 +56,3 @@ if ($DEBUG_MODE) {
   ini_set('display_errors', 1);
 }
 
-?>

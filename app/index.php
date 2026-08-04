@@ -1,16 +1,14 @@
+<?php
+  $allowedUserTypes = ['all'];
+  $SiteTitle = 'Home';
+  require_once 'config.php';
+  include_once $hostPath.'/src/check-permission.php';
+?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 
 <head>
-  <?php
-
-    $allowedUserTypes = ['all'];
-    $SiteTitle = 'Home';
-
-    require_once 'config.php';
-    include_once $hostPath.'/src/check-permission.php';
-    include_once $hostPath.'/src/head.php';
-  ?>
+  <?php include_once $hostPath.'/src/head.php'; ?>
 </head>
 
 <body>

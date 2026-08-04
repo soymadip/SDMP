@@ -1,25 +1,25 @@
-version: "3.9"
-
 networks:
   sdmp-network:
     name: sdmp-network
     driver: bridge
 
 services:
-  postgres:
-    image: postgres:17.4
-    container_name: sdmp-db
+  mariadb:
+    image: mariadb:latest
+    container_name: sdmp-mariadb
     restart: always
     environment:
-      POSTGRES_USER: "${POSTGRES_USER}"
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
-      POSTGRES_DB: "${POSTGRES_DB}"
+      MARIADB_USER: "${MARIADB_USER}"
+      MARIADB_PASSWORD: "${MARIADB_PASSWORD}"
+      MARIADB_ROOT_PASSWORD: "${MARIADB_PASSWORD}"
+      MARIADB_DATABASE: "${MARIADB_DATABASE}"
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ./data/mariadb:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
     ports:
-      - "5432:5432"
+      - "3306:3306"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
       start_period: 3s
       interval: 8s
       timeout: 5s
@@ -27,20 +27,20 @@ services:
     networks:
       - sdmp-network
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: sdmp-pgadmin
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: sdmp-phpmyadmin
     restart: always
     environment:
-      PGADMIN_DEFAULT_EMAIL: "${PGADMIN_DEFAULT_EMAIL}"
-      PGADMIN_DEFAULT_PASSWORD: "${PGADMIN_DEFAULT_PASSWORD}"
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
     ports:
-      - "5050:80"
+      - "${PHPMYADMIN_PORT:-5050}:80"
     depends_on:
-      postgres:
+      mariadb:
         condition: service_healthy
     volumes:
-      - ./data/pgadmin:/var/lib/pgadmin
+      - ./data/phpmyadmin:/sessions
     networks:
       - sdmp-network
 
@@ -49,21 +49,22 @@ services:
     container_name: sdmp
     restart: always
     ports:
-      - "8080:80"
+      - "9000:80"
     volumes:
       - ./app:/var/www/html
     depends_on:
-      - postgres
+      mariadb:
+        condition: service_healthy
     environment:
       - APACHE_DOCUMENT_ROOT=/var/www/html
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - DB_HOST=postgres
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - DB_HOST=mariadb
+      - APP_DEBUG=${APP_DEBUG:-false}
     command: >
       bash -c "apt-get update && 
-      apt-get install -y libpq-dev && 
-      docker-php-ext-install pdo pdo_pgsql pgsql && 
+      docker-php-ext-install pdo pdo_mysql &&
       a2enmod rewrite && 
       apache2-foreground"
     networks:

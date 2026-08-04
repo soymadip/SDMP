@@ -1,19 +1,13 @@
+<?php
+  $SiteTitle = 'Admin Dash';
+  require_once dirname(__DIR__) . '/config.php';
+  include_once dirname(__DIR__) . '/src/check-permission.php';
+?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 
 <head>
-  <?php
-    if (session_status() == PHP_SESSION_NONE) {
-      session_start();
-    }
-
-    $SiteTitle = 'Admin Dash';
-
-    include_once dirname(__DIR__) . '/src/check-permission.php';
-    include_once dirname(__DIR__) . '/config.php';
-    include_once dirname(__DIR__) . '/src/head.php';
-
-  ?>
+  <?php include_once dirname(__DIR__) . '/src/head.php'; ?>
 </head>
 
 <body>

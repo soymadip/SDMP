@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS users (
+    username VARCHAR(255) PRIMARY KEY,
+    pass TEXT NOT NULL,
+    type TEXT NOT NULL DEFAULT 'user'
+);

@@ -1,3 +1,4 @@
+<?php require_once '../config.php'; ?>
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
 
@@ -7,10 +8,7 @@
 
     $SiteTitle = 'Redirecting...';
 
-    include '../config.php';
     include 'head.php';
-
-    $conn = mysqli_connect($db_host, $db_user, $db_pass, $db_name);
 
     $error_message = '';
     $spinner_level = 'danger';
@@ -18,27 +16,37 @@
     $redirect_delay = 2500;
     $action = '';
 
+    try {
+      $conn = new PDO(
+        "mysql:host=$db_host;port=$db_port;dbname=$db_name;charset=utf8mb4",
+        $db_user,
+        $db_pass,
+        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
+      );
+    } catch (PDOException $exception) {
+      $conn = null;
+      $error_message = 'Database connection failed.';
+    }
+
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
       $username = isset($_POST['username']) ? $_POST['username'] : '';
       $password = isset($_POST['password']) ? $_POST['password'] : '';
       $action   = isset($_POST['action']) ? $_POST['action'] : '';
 
-      if ($action == 'login') {
+      if (!$conn) {
+        $error_message = 'Database connection failed.';
+      } elseif ($action == 'login') {
+        $statement = $conn->prepare('SELECT username, pass, type FROM users WHERE username = :username');
+        $statement->execute(['username' => $username]);
+        $user = $statement->fetch();
 
-        $query = "SELECT * FROM users WHERE username = '$username'";
-        $result = mysqli_query($conn, $query);
-
-        if (!$result) {
-          $error_message = 'Query failed: ' . mysqli_error($conn);
-          // die("Query failed: " . mysqli_error($conn));
-        }
-
-        if (mysqli_num_rows($result) == 1) {
-
-          $user = mysqli_fetch_assoc($result);
-
-          if ($password == $user['pass']) {
+        if ($user && (password_verify($password, $user['pass']) || hash_equals($user['pass'], $password))) {
+          if (!password_verify($password, $user['pass'])) {
+            $updatedPassword = password_hash($password, PASSWORD_DEFAULT);
+            $update = $conn->prepare('UPDATE users SET pass = :pass WHERE username = :username');
+            $update->execute(['pass' => $updatedPassword, 'username' => $username]);
+          }
 
             $_SESSION['username'] = $username;
             $_SESSION['usertype'] = $user['type'];
@@ -48,41 +56,27 @@
             $redirect_url = "../dash/$usertype.php";
             $redirect_delay = 1500;
 
-          } else {
-            $error_message = 'Incorrect password.';
-          }
-
         } else {
-          $error_message = 'Username not found.';
+          $error_message = $user ? 'Incorrect password.' : 'Username not found.';
         }
 
       } elseif ($action == 'signup') {
+        $statement = $conn->prepare('SELECT 1 FROM users WHERE username = :username');
+        $statement->execute(['username' => $username]);
 
-        // Check if already exists
-        $check_query = "SELECT * FROM users WHERE username = '$username'";
-        $check_result = mysqli_query($conn, $check_query);
-
-        if (!$check_result) {
-
-          $error_message = 'Query failed: ' . mysqli_error($conn);
-          // die("Query failed: " . mysqli_error($conn));
-        }
-
-        if (mysqli_num_rows($check_result) > 0) {
+        if ($statement->fetch()) {
           $error_message = 'Username already exists.';
-
         } else {
-          $usertype = $_POST['usertype'];
-          $query = "INSERT INTO users (username, pass, type) VALUES ('$username', '$password', '$usertype')";
-
-          if (mysqli_query($conn, $query)) {
-            $spinner_level = 'success';
-            $redirect_url = '../index.php';
-            $redirect_delay = 1500;
-
-          } else {
-            $error_message = 'Registration failed.';
-          }
+          $usertype = $_POST['usertype'] ?? 'user';
+          $statement = $conn->prepare('INSERT INTO users (username, pass, type) VALUES (:username, :pass, :type)');
+          $statement->execute([
+            'username' => $username,
+            'pass' => password_hash($password, PASSWORD_DEFAULT),
+            'type' => $usertype
+          ]);
+          $spinner_level = 'success';
+          $redirect_url = '../index.php';
+          $redirect_delay = 1500;
         }
 
       } elseif ($action == 'logout') {

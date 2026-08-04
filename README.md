@@ -25,7 +25,7 @@ This project is being developed as my college's major-project submission.
 ## 🛠️ Technologies Used
 
 - **Backend**: PHP
-- **Database**: PostgreSQL
+- **Database**: MariaDB
 - **Frontend**: HTML, Bootstrap
 - **Containerization**: Podman/Docker & Compose
 
@@ -54,12 +54,12 @@ This project is being developed as my college's major-project submission.
    ```
 4. Access the application at:
    ```shell
-   http://localhost:8080
+   http://localhost:9000
    ```
 
 5. Also for,
-   - **pgAdmin**: `http://localhost:5050`
-   - **SQL Server**: `http://localhost:5432`
+   - **phpMyAdmin**: `http://localhost:8080`
+   - **MariaDB**: `http://localhost:3306`
 
 
 ## 📊 App Configuration
@@ -71,4 +71,4 @@ The configuration file can be found in `app/config.php`.
 
 <!-- ai generated -->
 - Bootstrap Team for their excellent CSS framework
-- PostgreSQL community for the robust database system
+- MariaDB community for the robust database system
