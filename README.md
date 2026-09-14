@@ -6,13 +6,17 @@ Student Database Management Portal</h1>
 </div>
 <br>
 
+> [!WARNING]
+> This branch holds legacy PHP code.
+> We are currently migrating to Python/FastAPI.
+
+</br>
 
 ## 📑 Overview
 
-SDMP (Student Database Management Portal) is a web application designed to manage student records efficiently. It provides an intuitive interface for administrators and teachers to maintain student data, track academic progress, and generate reports.  
+SDMP (Student Database Management Portal) is a web application designed to manage student records efficiently. It provides an intuitive interface for administrators and teachers to maintain student data, track academic progress, and generate reports.
 
 This project is being developed as my college's major-project submission.
-
 
 ## ✨ Features
 
@@ -21,14 +25,12 @@ This project is being developed as my college's major-project submission.
 - **Student Records**: Comprehensive management of student personal and academic information
 - **Search & Filter**: Advanced search capabilities to find student records quickly
 
-
 ## 🛠️ Technologies Used
 
 - **Backend**: PHP
 - **Database**: MariaDB
 - **Frontend**: HTML, Bootstrap
 - **Containerization**: Podman/Docker & Compose
-
 
 ## 🚀 Installation
 
@@ -45,6 +47,7 @@ This project is being developed as my college's major-project submission.
    git clone https://github.com/soymadip/SDMP
    cd SDMP
    ```
+
 2. Edit the [.env](./.env) file with the required values.
 
 3. Run the setup:
@@ -52,7 +55,9 @@ This project is being developed as my college's major-project submission.
    ```shell
    ./run --detach
    ```
+
 4. Access the application at:
+
    ```shell
    http://localhost:9000
    ```
@@ -80,14 +85,13 @@ The development database also includes a highest-privilege account:
 
 Change or remove this account before deploying publicly.
 
-
 ## 📊 App Configuration
 
 The configuration file can be found in `app/config.php`.
 
-
-## 🙏 Credits 
+## 🙏 Credits
 
 <!-- ai generated -->
+
 - Bootstrap Team for their excellent CSS framework
 - MariaDB community for the robust database system
